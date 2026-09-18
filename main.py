@@ -62,11 +62,11 @@ def atrito():
         
   atrito = int(input("Digite o número da opção: "))
 
-  if atrito == (1):
+  if atrito == ('1'):
    atr = 0.8
-  elif atrito == (2):
+  elif atrito == ('2'):
    atr = 0.4
-  elif atrito == (3):
+  elif atrito == ('3'):
    atr = 0.52
   return atr
 
