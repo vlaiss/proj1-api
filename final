@@ -34,12 +34,20 @@ def tempo_reacao():
     valor_tempo = 1.5
   elif opcao == 3:
     valor_tempo = 2.0
-return valor_tempo
+  return valor_tempo
+
+def frenagem(vel_atual_ms, atrito):
+  frenagem = (vel_atual_ms ** 2) / (2 * atrito * 9.81)
+  return frenagem
+
+def dis_seg(vel_atual_ms, tempo_reacao, frenagem):
+  dis_seg = vel_atual_ms * tempo_reacao + frenagem
+  return dis_seg
 
 # Exigências C
 def analise_colisao(vel_rel, dis_val, dis_seg):
   if vel_rel <= 0 or dis_val >= dis_seg:
-    status_frontal = 'NORMAL'
+    status_frontal = 'SEGURO'
     status_aeb = 'não acionado'
   elif (dis_val < dis_seg) and (dis_val >= dis_seg * 0.5):
     status_frontal = 'ATENCAO'
@@ -47,7 +55,7 @@ def analise_colisao(vel_rel, dis_val, dis_seg):
   else:
     status_frontal = 'RISCO DE COLISÃO'
     status_aeb = 'ACIONADO'
-return status_frontal, status_aeb
+  return status_frontal, status_aeb
 
 # Exigências D
 def ajuste_margem(vel_atual):
@@ -75,6 +83,10 @@ def inv_dir(dis_faixa_dir, margem):
     mensagem = 'NORMAL'
   return mensagem
 
+# Exigências E
+def status_adas():
+  1+1
+
 # main
 vel_atual = float(input('Velocidade do veículo atual (km/h): '))
 vel_frente = float(input('Velocidade do veículo à frente (km/h): '))
@@ -91,7 +103,9 @@ dis_faixa_dir = float(input('Distância da faixa direita (metros): '))
 dis_val = dis_validada(sens_radar, sens_lidar, sens_camera)
 
 vel_atual_ms = converter_km_para_metros(vel_atual)
-dis_seg = (vel_atual_ms * tempo_reacao) + ((vel_atual_ms ** 2) / (2 * atrito * 9.81))
+frenagem = frenagem(vel_atual_ms, atrito)
+dis_seg = round(dis_seg(vel_atual_ms, tempo_reacao, frenagem), 3)
+
 status_frontal, status_aeb = analise_colisao(vel_rel, dis_val, dis_seg)
 
 margem = ajuste_margem(vel_atual)
@@ -99,11 +113,12 @@ resultado_esq = inv_esq(dis_faixa_esq, margem)
 resultado_dir = inv_dir(dis_faixa_dir, margem)
 
 print(f'''
-Distância válida: {dis_val}
-Distância segura: {dis_seg}
+Distância válida: {dis_val}m
+Distância segura: {dis_seg}m
 Status frontal: {status_frontal}
 AEB: {status_aeb}
-Margem lateral exigida: {margem}
+Margem lateral exigida: {margem}m
 Faixa esquerda: {resultado_esq}
 Faixa direita: {resultado_dir}
+STATUS GERAL: 
 ''')
